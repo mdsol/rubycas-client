@@ -7,7 +7,10 @@ module CasSessionStore
 
     module ClassMethods
       def store_service_session_lookup(st, sid)
-        CasSession.create(:service_ticket => st.ticket, :session_id => sid)
+        cas = CasSession.new()
+        cas.service_ticket = st.ticket
+        cas.session_id = sid
+        cas.save()
       end
 
       # find CAS-ticket
