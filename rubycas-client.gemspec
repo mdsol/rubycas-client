@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rubycas-client}
-  s.version = "2.2.2"
+  s.version = "2.2.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Zukowski", "Matt Walker"]
@@ -18,19 +18,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.2.0}
   s.summary = %q{Client library for the Central Authentication Service (CAS) protocol.}
 
-  if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 2
+  s.add_runtime_dependency(%q<activesupport>, [">= 0"])
+  s.add_development_dependency(%q<hoe>, [">= 1.7.0"])
+  s.add_dependency 'dice_bag', '~> 0.6' 
 
-    if current_version >= 3 then
-      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
-      s.add_development_dependency(%q<hoe>, [">= 1.7.0"])
-    else
-      s.add_dependency(%q<activesupport>, [">= 0"])
-      s.add_dependency(%q<hoe>, [">= 1.7.0"])
-    end
-  else
-    s.add_dependency(%q<activesupport>, [">= 0"])
-    s.add_dependency(%q<hoe>, [">= 1.7.0"])
-  end
 end
