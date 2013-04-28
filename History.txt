@@ -1,5 +1,11 @@
 = RubyCAS-Client Changelog
 
+== Version 2.2.3 :: 2013-04-29
+* Added dicebag template
+
+== Version 2.2.2 :: 2013-02-07
+* Avoid mass assignment errors
+
 == Version 2.2.1 :: 2011-01-04
 * Added support for Rails 3
 

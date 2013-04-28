@@ -1,0 +1,5 @@
+<% [ :production, :development, :test ].each do |env| %> 
+<%= env %>:
+  cas_domain: <%= configured[env].cas_domain || 'localhost' %>
+  cas_base_url: <%= configured[env].cas_base_url || 'http://localhost:7890' %>
+<% end %>
