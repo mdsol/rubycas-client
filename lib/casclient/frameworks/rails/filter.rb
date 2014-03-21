@@ -227,7 +227,13 @@ module CASClient
           def logout(controller, service = nil)
             referer = service || controller.request.referer
             st = controller.session[:cas_last_valid_ticket]
-            delete_service_session_lookup(st.ticket) if st
+            if st.respond_to?(:ticket)
+              delete_service_session_lookup(st.ticket)
+            elsif st.is_a?(String)
+              delete_service_session_lookup(st)
+            else
+              log.error("Unknown Service Ticket #{st.inspect}")
+            end
             controller.send(:reset_session)
             controller.send(:redirect_to, client.logout_url(referer))
           end
