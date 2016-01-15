@@ -13,6 +13,10 @@ module CASClient
         DEFAULT_TIMEOUT = 30.minutes
         
         class << self
+          def before(controller)
+            filter(controller)
+          end
+
           def filter(controller)
             raise "Cannot use the CASClient filter because it has not yet been configured." if config.nil?
             
