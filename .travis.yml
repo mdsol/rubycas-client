@@ -1,20 +1,22 @@
 language: ruby
 rvm:
-  - 1.8.7
-  - 1.9.2
   - 1.9.3
-  - ruby-head
-  - ree
-  - jruby-18mode
-  - jruby-19mode
-  - jruby-head
-  - rbx-18mode
-  - rbx-19mode
-jdk:
-  - oraclejdk7
-matrix:
-  allow_failures:
-    - rvm: jruby-19mode
-    - rvm: jruby-head
-    - rvm: rbx-19mode
-    - rvm: ruby-head
+  - 2.1.2
+  - 2.2.3
+  - 2.3.0
+#  - ruby-head
+#  - ree
+#  - jruby-19mode
+#  - jruby-head
+#  - rbx-19mode
+#jdk:
+#  - oraclejdk7
+#matrix:
+#  allow_failures:
+#    - rvm: jruby-19mode
+#    - rvm: jruby-head
+#    - rvm: rbx-19mode
+#    - rvm: ruby-head
+script:
+  - bundle exec rspec
+dist: trusty
