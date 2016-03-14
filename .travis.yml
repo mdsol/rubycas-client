@@ -4,16 +4,17 @@ rvm:
   - 2.1.2
   - 2.2.3
   - 2.3.0
-  - ruby-head
-  - ree
-  - jruby-19mode
-  - jruby-head
-  - rbx-19mode
-jdk:
-  - oraclejdk7
-matrix:
-  allow_failures:
-    - rvm: jruby-19mode
-    - rvm: jruby-head
-    - rvm: rbx-19mode
-    - rvm: ruby-head
+#  - ruby-head
+#  - ree
+#  - jruby-19mode
+#  - jruby-head
+#  - rbx-19mode
+#jdk:
+#  - oraclejdk7
+#matrix:
+#  allow_failures:
+#    - rvm: jruby-19mode
+#    - rvm: jruby-head
+#    - rvm: rbx-19mode
+#    - rvm: ruby-head
+dist: trusty
