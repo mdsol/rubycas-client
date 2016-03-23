@@ -21,10 +21,11 @@ module ActionControllerHelpers
     controller.stub(:params) {parameters}
     controller
   end
-
   def mock_post_request
-      mock_request = ActionController::Request.new({})
-      mock_request.stub(:post?) {true}
-      mock_request
+    mock_request = double("request")
+    mock_request.stub(:post?) {true}
+    mock_request.stub(:session_options) { Hash.new }
+    mock_request.stub(:headers) { Hash.new }
+    mock_request
   end
 end

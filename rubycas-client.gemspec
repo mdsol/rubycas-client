@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "rubycas-client"
-  s.version = "2.3.12"
+  s.version = "2.3.13"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Zukowski", "Matt Walker", "Matt Campbell"]
@@ -14,71 +14,7 @@ Gem::Specification.new do |s|
     "LICENSE.txt",
     "README.rdoc"
   ]
-  s.files = [
-    ".rspec",
-    ".simplecov",
-    ".travis.yml",
-    "CHANGELOG.txt",
-    "Gemfile",
-    "Gemfile.lock",
-    "Guardfile",
-    "History.txt",
-    "LICENSE.txt",
-    "README.rdoc",
-    "Rakefile",
-    "TODO.md",
-    "VERSION",
-    "examples/rails/README",
-    "examples/rails/app/controllers/advanced_example_controller.rb",
-    "examples/rails/app/controllers/application.rb",
-    "examples/rails/app/controllers/simple_example_controller.rb",
-    "examples/rails/app/views/advanced_example/index.html.erb",
-    "examples/rails/app/views/advanced_example/my_account.html.erb",
-    "examples/rails/app/views/simple_example/index.html.erb",
-    "examples/rails/config/boot.rb",
-    "examples/rails/config/environment.rb",
-    "examples/rails/config/environments/development.rb",
-    "examples/rails/config/environments/production.rb",
-    "examples/rails/config/environments/test.rb",
-    "examples/rails/config/initializers/inflections.rb",
-    "examples/rails/config/initializers/mime_types.rb",
-    "examples/rails/config/initializers/new_rails_defaults.rb",
-    "examples/rails/config/routes.rb",
-    "examples/rails/log/development.log",
-    "examples/rails/log/production.log",
-    "examples/rails/log/server.log",
-    "examples/rails/log/test.log",
-    "examples/rails/script/about",
-    "examples/rails/script/console",
-    "examples/rails/script/server",
-    "lib/casclient.rb",
-    "lib/casclient/client.rb",
-    "lib/casclient/frameworks/rails/cas_proxy_callback_controller.rb",
-    "lib/casclient/frameworks/rails/filter.rb",
-    "lib/casclient/responses.rb",
-    "lib/casclient/tickets.rb",
-    "lib/casclient/tickets/storage.rb",
-    "lib/casclient/tickets/storage/active_record_ticket_store.rb",
-    "lib/rubycas-client.rb",
-    "rails_generators/active_record_ticket_store/USAGE",
-    "rails_generators/active_record_ticket_store/active_record_ticket_store_generator.rb",
-    "rails_generators/active_record_ticket_store/templates/README",
-    "rails_generators/active_record_ticket_store/templates/migration.rb",
-    "rubycas-client.gemspec",
-    "spec/.gitignore",
-    "spec/casclient/client_spec.rb",
-    "spec/casclient/frameworks/rails/filter_spec.rb",
-    "spec/casclient/tickets/storage/active_record_ticket_store_spec.rb",
-    "spec/casclient/tickets/storage_spec.rb",
-    "spec/casclient/validation_response_spec.rb",
-    "spec/database.yml",
-    "spec/spec_helper.rb",
-    "spec/support/action_controller_helpers.rb",
-    "spec/support/active_record_helpers.rb",
-    "spec/support/local_hash_ticket_store.rb",
-    "spec/support/local_hash_ticket_store_spec.rb",
-    "spec/support/shared_examples_for_ticket_stores.rb"
-  ]
+  s.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   s.homepage = "http://github.com/rubycas/rubycas-client"
   s.licenses = ["MIT"]
   s.rdoc_options = ["--main", "README.rdoc"]
@@ -86,59 +22,19 @@ Gem::Specification.new do |s|
   s.rubygems_version = "1.8.23"
   s.summary = "Client library for the Central Authentication Service (CAS) protocol."
 
-  if s.respond_to? :specification_version then
-    s.specification_version = 3
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
-      s.add_runtime_dependency 'dice_bag', '>= 0.9', '< 2.0'
-      s.add_development_dependency(%q<json>, [">= 0"])
-      s.add_development_dependency(%q<rspec>, [">= 0"])
-      s.add_development_dependency(%q<bundler>, [">= 1.0"])
-      s.add_development_dependency(%q<jeweler>, [">= 0"])
-      s.add_development_dependency(%q<actionpack>, [">= 0"])
-      s.add_development_dependency(%q<activerecord>, [">= 0"])
-      s.add_development_dependency(%q<rake>, [">= 0"])
-      s.add_development_dependency(%q<simplecov>, [">= 0"])
-      s.add_development_dependency(%q<guard>, [">= 0"])
-      s.add_development_dependency(%q<guard-rspec>, [">= 0"])
-      s.add_development_dependency(%q<database_cleaner>, [">= 0"])
-      s.add_development_dependency(%q<sqlite3>, [">= 0"])
-      s.add_development_dependency(%q<jruby-openssl>, [">= 0"])
-      s.add_development_dependency(%q<activerecord-jdbcsqlite3-adapter>, [">= 0"])
-    else
-      s.add_dependency(%q<activesupport>, [">= 0"])
-      s.add_dependency(%q<json>, [">= 0"])
-      s.add_dependency(%q<rspec>, [">= 0"])
-      s.add_dependency(%q<bundler>, [">= 1.0"])
-      s.add_dependency(%q<jeweler>, [">= 0"])
-      s.add_dependency(%q<actionpack>, [">= 0"])
-      s.add_dependency(%q<activerecord>, [">= 0"])
-      s.add_dependency(%q<rake>, [">= 0"])
-      s.add_dependency(%q<simplecov>, [">= 0"])
-      s.add_dependency(%q<guard>, [">= 0"])
-      s.add_dependency(%q<guard-rspec>, [">= 0"])
-      s.add_dependency(%q<database_cleaner>, [">= 0"])
-      s.add_dependency(%q<sqlite3>, [">= 0"])
-      s.add_dependency(%q<jruby-openssl>, [">= 0"])
-      s.add_dependency(%q<activerecord-jdbcsqlite3-adapter>, [">= 0"])
-    end
-  else
-    s.add_dependency(%q<activesupport>, [">= 0"])
-    s.add_dependency(%q<json>, [">= 0"])
-    s.add_dependency(%q<rspec>, [">= 0"])
-    s.add_dependency(%q<bundler>, [">= 1.0"])
-    s.add_dependency(%q<jeweler>, [">= 0"])
-    s.add_dependency(%q<actionpack>, [">= 0"])
-    s.add_dependency(%q<activerecord>, [">= 0"])
-    s.add_dependency(%q<rake>, [">= 0"])
-    s.add_dependency(%q<simplecov>, [">= 0"])
-    s.add_dependency(%q<guard>, [">= 0"])
-    s.add_dependency(%q<guard-rspec>, [">= 0"])
-    s.add_dependency(%q<database_cleaner>, [">= 0"])
-    s.add_dependency(%q<sqlite3>, [">= 0"])
-    s.add_dependency(%q<jruby-openssl>, [">= 0"])
-    s.add_dependency(%q<activerecord-jdbcsqlite3-adapter>, [">= 0"])
-  end
+  s.add_runtime_dependency 'activesupport', ">= 0"
+  s.add_runtime_dependency 'dice_bag', '>= 0.9', '< 2.0'
+  s.add_development_dependency 'json', '>= 0'
+  s.add_development_dependency 'rspec', '>= 0'
+  s.add_development_dependency 'bundler', '>= 1.0'
+  s.add_development_dependency 'jeweler', '>= 0'
+  s.add_development_dependency 'actionpack', '>= 0'
+  s.add_development_dependency 'activerecord', '>= 0'
+  s.add_development_dependency 'rake', '>= 0'
+  s.add_development_dependency 'simplecov', '>= 0'
+  s.add_development_dependency 'guard', '>= 0'
+  s.add_development_dependency 'guard-rspec', '>= 0'
+  s.add_development_dependency 'database_cleaner', '>= 0'
+  s.add_development_dependency 'sqlite3', '>= 0'
 end
 

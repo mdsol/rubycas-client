@@ -1,3 +1,5 @@
+require 'active_support/time'
+
 module CASClient
   module Frameworks
     module Rails
@@ -26,6 +28,7 @@ module CASClient
               controller.session[client.username_session_key] = @@fake_user
               controller.session[:casfilteruser] = @@fake_user
               controller.session[client.extra_attributes_session_key] = @@fake_extra_attributes if @@fake_extra_attributes
+              controller.session.update(@@fake_additional_session_attributes) if @@fake_additional_session_attributes
               return true
             end
             
@@ -150,9 +153,10 @@ module CASClient
           #  CASClient::Frameworks::Rails::Filter.fake("homer")
           # you can also fake extra attributes by including a second parameter
           #  CASClient::Frameworks::Rails::Filter.fake("homer", {:roles => ['dad', 'husband']})
-          def fake(username, extra_attributes = nil)
+          def fake(username, extra_attributes = nil, additional_session_attributes = nil)
             @@fake_user = username
             @@fake_extra_attributes = extra_attributes
+            @@fake_additional_session_attributes = additional_session_attributes
           end
           
           def use_gatewaying?

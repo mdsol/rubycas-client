@@ -1,5 +1,9 @@
 = RubyCAS-Client Changelog
 
+== Version 2.3.13 :: 2016-03-14
+* New functionality
+  * Add the ability to set any top-level session attribute for the fake user.
+
 == Version 2.3.12 :: 2016-03-11
 * New functionality
   * Add before method to lib/casclient/frameworks/rails/filter.rb
