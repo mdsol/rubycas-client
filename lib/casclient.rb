@@ -3,7 +3,6 @@ require 'cgi'
 require 'logger'
 require 'net/https'
 require 'rexml/document'
-require 'casclient/dice_bag/cas_template'
 
 begin
   require 'active_support'
@@ -57,7 +56,7 @@ module CASClient
     # Log using the appropriate method if we have a logger
     # if we dont' have a logger, gracefully ignore.
     def method_missing(name, *args)
-      if !@real_logger.nil? && @real_logger.respond_to?(name)
+      if @real_logger && @real_logger.respond_to?(name)
         @real_logger.send(name, *args)
       end
     end
@@ -67,12 +66,7 @@ end
 require 'casclient/tickets'
 require 'casclient/responses'
 require 'casclient/client'
-require 'casclient/tickets/storage'
-autoload :ACTIVE_RECORD_TICKET_STORE, 'casclient/tickets/storage/active_record_ticket_store'
-if defined?(Rails)
-  require 'casclient/frameworks/rails/filter'
-  require 'casclient/frameworks/rails/cas_proxy_callback_controller'
-end
+require 'casclient/version'
 
 # Detect legacy configuration and show appropriate error message
 module CAS

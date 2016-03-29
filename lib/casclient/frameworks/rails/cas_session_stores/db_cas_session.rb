@@ -7,13 +7,10 @@ module CasSessionStore
 
     module ClassMethods
       def store_service_session_lookup(st, sid)
-        raise CASException, 'No service_ticket specified.' unless st
-        raise CASException, 'No session specified.' unless sid
-        # We need to use .save instead of .create or the service_ticket won't be stored
-        cas = CasSession.new
+        cas = CasSession.new()
         cas.service_ticket = st.ticket
         cas.session_id = sid
-        raise CASException, "Unable to store session #{sid} for service ticket #{st}" unless cas.save
+        cas.save()
       end
 
       # find CAS-ticket

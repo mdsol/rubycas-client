@@ -1,14 +1,14 @@
-= RubyCAS-Client 
+= RubyCAS-Client
 
-Authors::   Matt Zukowski <matt AT roughest DOT net> and Matt Campbell <matt AT soupmatt DOT com>; inspired by code by Ola Bini <ola.bini AT ki DOT se> and Matt Walker <mwalker AT tamu DOT edu>
+Author::    Matt Zukowski <matt AT roughest DOT net>; inspired by code by Ola Bini <ola.bini AT ki DOT se> and Matt Walker <mwalker AT tamu DOT edu>
 Copyright:: Portions contributed by Matt Zukowski are copyright (c) 2009 Urbacon Ltd.
-            Portions contributed by Matt Campbell, Rich Yarger and Rahul Joshi are copyright (c) 2011 Vibes Media LLC.
             Other portions are copyright of their respective authors.
 License::   MIT License
-Websites::  http://github.com/rubycas/rubycas-client
-            http://github.com/rubycas/rubycas-client/wiki
-            http://rubydoc.info/github/rubycas/rubycas-client/master/frames
-Build Status:: {<img src="http://travis-ci.org/rubycas/rubycas-client.png" />}[http://travis-ci.org/rubycas/rubycas-client]
+Websites::  http://github.com/gunark/rubycas-client
+            http://code.google.com/p/rubycas-client
+            http://rubyforge.org/projects/rubycas-client
+            
+
 
 === RubyCAS-Client is a Ruby client library for Yale's Central Authentication Service (CAS) protocol.
 
@@ -35,11 +35,6 @@ API documentation (i.e. the RDocs) are available at http://rubycas-client.rubyfo
 
 
 == Installation
-
-<b>NOTE:</b> For compatibility with Rails 3 have a look at https://github.com/zuk/rubycas-client-rails
-
-The current version of RubyCAS-Client should work with Rails 2.3.6 and up. For compatibility with
-older Rails try using an older version of the client.
 
 You can download the latest version of RubyCAS-Client from the project's rubyforge page at 
 http://rubyforge.org/projects/rubycas-client.
@@ -110,7 +105,7 @@ Here is a more complicated configuration showing most of the configuration optio
 (this does not show proxy options, which are covered in the next section):
 
   # enable detailed CAS logging
-  cas_logger = CASClient::Logger.new(::Rails.root+'/log/cas.log')
+  cas_logger = CASClient::Logger.new(RAILS_ROOT+'/log/cas.log')
   cas_logger.level = Logger::DEBUG
 
   CASClient::Frameworks::Rails::Filter.configure(
@@ -151,7 +146,7 @@ notify the client application that the CAS session is closed. The client will au
 requsts from the CAS server, but in order for this to work you must configure your Rails application as follows:
 
 1. The Rails session store must be set to ActiveRecord: <tt>config.action_controller.session_store = :active_record_store</tt>
-2. The server must be able to read and write to Rails.root/tmp/sessions. If you are in a clustered environment,
+2. The server must be able to read and write to RAILS_ROOT/tmp/sessions. If you are in a clustered environment,
    the contents of this directory must be shared between all server instances. 
 3. Cross-site request forgery protection must be disabled. In your <tt>application.rb</tt>: <tt>self.allow_forgery_protection = false</tt>.
    (Or rather you may want to disable forgery protection only for actions that are behind the CAS filter.)
@@ -232,11 +227,12 @@ all you need to do is this:
 In your <tt>config/environment.rb</tt>:
 
   # enable detailed CAS logging for easier troubleshooting
-  cas_logger = CASClient::Logger.new(::Rails.root+'/log/cas.log')
+  cas_logger = CASClient::Logger.new(RAILS_ROOT+'/log/cas.log')
   cas_logger.level = Logger::DEBUG
 
   CASClient::Frameworks::Rails::Filter.configure(
     :cas_base_url => "https://cas.example.foo/",
+    :proxy_retrieval_url => "https://cas-proxy-callback.example.foo/cas_proxy_callback/retrieve_pgt",
     :proxy_callback_url => "https://cas-proxy-callback.example.foo/cas_proxy_callback/receive_pgt",
     :logger => cas_logger
   )
@@ -256,9 +252,12 @@ but your Rails server wouldn't respond to the CAS server's callback until the CA
 
 The simplest workaround is this:
 
-Run rails using a server that handles multiple concurrent requests. In development, you can use Phusion Passenger Standalone,
-POW (http://pow.cx/), unicorn and many others. In production, I imagine you already support multiple concurrent requests.
-
+1. Create an empty rails app (i.e. something like <tt>rails cas_proxy_callback</tt>)
+2. Make sure that you have the CAS plugin installed. If you installed it as a gem, you don't have to do anything since
+   it is already installed. If you want to install as a plugin, see the instructions in the "Installing" section above.
+3. Make sure that the server is up and running, and configure your proxy_callback_url and proxy_retrieval_url to point
+   to the new server as described above (or rather, make Pound point to the new server, if that's how you're handling https).
+   
 That's it. The proxy_callback_controller doesn't require any additional configuration. It doesn't access the database
 or anything of that sort.
 
@@ -302,6 +301,21 @@ To install the library on an Debian/Ubuntu system:
 
 For other platforms you'll have to figure it out yourself.
 
+== Rails 3 Support (temporary solution)
+If you require to support Sing-Sign-out and Rails version is > = 3 you need to add following code.
+It was required due to bug using Rails 3.x.x and SSO. Without using SSO you can use default config parameters with Rails 3.
+
+CASClient::Frameworks::Rails::Filter.configure(
+  :cas_base_url => "https://cas.example.foo/",
+  :enable_single_sign_out => true,
+  :session_store => ActiveRecord::SessionStore, 
+  :rails3 => true
+)
+
+where 
+  :rails3 - is indicating whether Rails 3.x.x is used or not
+  :session_store  - provide session storage. Example: ActiveRecord::SessionStore
+
 == Testing
 
 In some cases, especially those using Cucumber or other tools that simply can't work with 
@@ -313,12 +327,6 @@ In your test or Cucumber step definition, simply fake out CAS.
 
 This functionality was present in the original version of this plugin.
 The value of the username is stored in session[:cas_user] (or the user specified field) and session[:casfilteruser] for backwards-compatibility.
-
-If you need to fake out extra attributes, you can do so like this:
-
-  CASClient::Frameworks::Rails::Filter.fake("homer", {:role => "user", :email => "homer@test.foo"})
-
-And the extra attributes will get put in the proper place in the session.
 
 == License
 

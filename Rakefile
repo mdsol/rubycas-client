@@ -1,46 +1,63 @@
-# encoding: utf-8
-
 require 'rubygems'
-require 'bundler'
-begin
-  Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
-end
 require 'rake'
-
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
-  gem.name = "rubycas-client"
-  gem.homepage = "http://github.com/rubycas/rubycas-client"
-  gem.license = "MIT"
-  gem.summary = "Client library for the Central Authentication Service (CAS) protocol."
-  gem.authors = ["Matt Zukowski", "Matt Walker", "Matt Campbell"]
-  gem.rdoc_options = ['--main', 'README.rdoc']
-  gem.files.exclude '.rvmrc', '.infinity_test', '.rbenv-version', '.rbenv-gemsets'
-  # dependencies defined in Gemfile
-end
-Jeweler::RubygemsDotOrgTasks.new
-
-begin
-  require 'rspec/core/rake_task'
-  desc 'Run RSpecs to confirm that all functionality is working as expected'
-  RSpec::Core::RakeTask.new('spec') do |t|
-    t.pattern = 'spec/**/*_spec.rb'
-  end
-  task :default => :spec
-rescue LoadError
-  puts "Hiding spec tasks because RSpec is not available"
-end
-
+require 'rake/clean'
+require 'rake/testtask'
+require 'rake/packagetask'
+require 'rake/gempackagetask'
 require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+require 'rake/contrib/rubyforgepublisher'
+require 'fileutils'
+require 'hoe'
+include FileUtils
+require File.join(File.dirname(__FILE__), 'lib', 'casclient', 'version')
 
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "rubycas-client #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+AUTHOR = ["Matt Zukowski", "Matt Walker"]  # can also be an array of Authors
+EMAIL = "matt at roughest dot net"
+DESCRIPTION = "Client library for the Central Authentication Service (CAS) protocol."
+GEM_NAME = "rubycas-client" # what ppl will type to install your gem
+RUBYFORGE_PROJECT = "rubycas-client" # The unix name for your project
+HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
+
+ENV['NODOT'] = '1'
+
+NAME = "rubycas-client"
+REV = nil
+#REV = `svn info`[/Revision: (\d+)/, 1] rescue nil
+VERS = ENV['VERSION'] || (CASClient::VERSION::STRING + (REV ? ".#{REV}" : ""))
+                          CLEAN.include ['**/.*.sw?', '*.gem', '.config']
+RDOC_OPTS = ['--quiet', '--title', "rubycas-client documentation",
+    "--opname", "index.html",
+    "--line-numbers", 
+    "--main", "README",
+    "--inline-source"]
+
+class Hoe
+  def extra_deps 
+    @extra_deps.reject { |x| Array(x).first == 'hoe' } 
+  end 
+end
+
+# Generate all the Rake tasks
+# Run 'rake -T' to see list of generated tasks (from gem root directory)
+hoe = Hoe.new(GEM_NAME, VERS) do |p|
+  p.author = AUTHOR 
+  p.description = DESCRIPTION
+  p.email = EMAIL
+  p.summary = DESCRIPTION
+  p.url = HOMEPATH
+  p.rubyforge_name = RUBYFORGE_PROJECT if RUBYFORGE_PROJECT
+  p.test_globs = ["test/**/*_test.rb"]
+  p.clean_globs = CLEAN  #An array of file patterns to delete on clean.
+  
+  # == Optional
+  #p.changes        - A description of the release's latest changes.
+  #p.extra_deps     - An array of rubygem dependencies.
+  #p.spec_extras    - A hash of extra values to set in the gemspec.
+  p.extra_deps = ['activesupport']
+end
+
+desc 'Build and install rubycas-client'
+task :install do
+  system "gem build rubycas-client.gemspec"
+  system "sudo gem install rubycas-client-#{VERS}.gem"
 end
