@@ -273,7 +273,11 @@ module CASClient
       req = Net::HTTP::Post.new(uri.path)
       req.set_form_data(data, ';')
       https = https_connection(uri)
-      https.start {|conn| conn.request(req) }
+      https.start do |conn|
+        conn.open_timeout = 180
+        conn.read_timeout = 180
+        conn.request(req)
+      end
     end
 
     def query_to_hash(query)

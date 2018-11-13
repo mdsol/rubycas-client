@@ -32,6 +32,8 @@ describe CASClient::Client do
     before :each do
       client.stub(:https_connection).and_return(session)
       session.stub(:start).and_yield(connection)
+      allow(connection).to receive(:open_timeout=)
+      allow(connection).to receive(:read_timeout=)
     end
     
     context "cas server is up" do
