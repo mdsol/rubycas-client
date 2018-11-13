@@ -247,6 +247,8 @@ module CASClient
       https = https_connection(uri)
       begin
         raw_res = https.start do |conn|
+          conn.open_timeout = 180
+          conn.read_timeout = 180
           conn.get("#{uri.path}?#{uri.query}")
         end
       rescue Errno::ECONNREFUSED => e
