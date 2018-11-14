@@ -245,6 +245,7 @@ module CASClient
 
       uri = URI.parse(uri) unless uri.kind_of? URI
       https = https_connection(uri)
+      logger.info("[DEXTER-LOOK] Requesting CAS Response...")
       begin
         raw_res = https.start do |conn|
           conn.open_timeout = 180
@@ -265,7 +266,7 @@ module CASClient
         log.error "CAS server responded with an error! (#{raw_res.inspect})"
         raise "The CAS authentication server at #{uri} responded with an error (#{raw_res.inspect})!"
       end
-
+      logger.info("[DEXTER-LOOK] Requesting CAS Response complete...")
       type.new(raw_res.body, @conf_options)
     end
 
@@ -275,11 +276,14 @@ module CASClient
       req = Net::HTTP::Post.new(uri.path)
       req.set_form_data(data, ';')
       https = https_connection(uri)
-      https.start do |conn|
+      logger.info("[DEXTER-LOOK] Submitting to CAS...")
+      hmm = https.start do |conn|
         conn.open_timeout = 180
         conn.read_timeout = 180
         conn.request(req)
       end
+      logger.info("[DEXTER-LOOK] Submitting to CAS COMPLETE..")
+      hmm
     end
 
     def query_to_hash(query)
