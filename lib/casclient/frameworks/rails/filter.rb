@@ -37,8 +37,8 @@ module CASClient
             last_st_service = controller.session[:cas_last_valid_ticket_service]
             
             if single_sign_out(controller)
-              controller.send(:render, :text => "CAS Single-Sign-Out request intercepted.")
-              return false 
+              controller.send(:render, plain: "CAS Single-Sign-Out request intercepted.")
+              return false
             end
 
             st = read_ticket(controller)
