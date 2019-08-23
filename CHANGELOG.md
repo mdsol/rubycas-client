@@ -1,5 +1,9 @@
 # RubyCAS-Client Changelog
 
+## 3.0.2
+* Upgrade
+  * Use `plain` instead of `text` while rendring from the controller as `text` is now deprecated.
+
 ## 3.0.1
 * Bug fixes
   * Use the version declared in `lib/casclient/version.rb` instead of hardcoding it in the gemspec file.
