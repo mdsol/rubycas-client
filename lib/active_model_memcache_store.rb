@@ -16,7 +16,9 @@ module ActionDispatch
 
       def set_session(env, sid, session_data, options = nil)
         puts '----------------------------set_session'
+        Rails.logger.info "---ActiveModelMemcacheStore--------> set_session: #{sid}"
         if @pool.exist?(sid)
+          Rails.logger.info "-----------> set_session 1"
           session = @pool.get(sid)
           # Copy session_id and service_ticket into the session_data
           %w(session_id service_ticket).each { |key| session_data[key] = session[key] if session[key] }
