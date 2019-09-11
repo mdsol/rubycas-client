@@ -15,6 +15,7 @@ module ActionDispatch
     class ActiveModelMemcacheStore < ActionDispatch::Session::DalliStore
 
       def set_session(env, sid, session_data, options = nil)
+        puts '----------------------------set_session'
         if @pool.exist?(sid)
           session = @pool.get(sid)
           # Copy session_id and service_ticket into the session_data
@@ -32,9 +33,13 @@ module ActionDispatch
         puts "---ActiveModelMemcacheStore--------> destroy_session: #{session_id}"
         Rails.logger.info "---ActiveModelMemcacheStore--------> destroy_session: #{session_id}"
         if @pool.exist?(session_id)
+          Rails.logger.info "-----------> destroy_session 1"
           session = @pool.get(session_id)
           if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
+
+            Rails.logger.info "-----------> destroy_session 2"
             begin
+              Rails.logger.info "-----------> destroy_session 3 deleting"
               @pool.delete(session["service_ticket"])
             rescue Dalli::DalliError
               Rails.logger.warn("Session::DalliStore#destroy_session: #{$!.message}")
