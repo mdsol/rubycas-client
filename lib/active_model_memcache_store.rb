@@ -29,6 +29,8 @@ module ActionDispatch
       # Need to ensure that when a session is being destroyed - we also clean up the service-ticket
       # related data prior to letting the session be destroyed.
       def destroy_session(env, session_id, options)
+        puts "---ActiveModelMemcacheStore--------> destroy_session: #{session_id}"
+        Rails.logger.info "---ActiveModelMemcacheStore--------> destroy_session: #{session_id}"
         if @pool.exist?(session_id)
           session = @pool.get(session_id)
           if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
