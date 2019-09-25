@@ -1,5 +1,9 @@
 # RubyCAS-Client Changelog
 
+## 3.0.4
+* Other
+  * Upgrade actionpack to get rid of unwanted sprockets dependency.
+
 ## 3.0.3
 * Other
   * support rails 5/rack 2.0. Memcached session support introduced in 3.0.2 updated to work with Rails 5.
