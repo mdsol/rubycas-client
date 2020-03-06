@@ -24,7 +24,7 @@ module CASClient
                     
           def filter(controller)
             raise "Cannot use the CASClient filter because it has not yet been configured." if config.nil?
-            Rails.logger.info "RubyCAS filter--------------1"
+            log.info "RubyCAS filter--------------1"
             if @@fake_user
               controller.session[client.username_session_key] = @@fake_user
               controller.session[:casfilteruser] = @@fake_user
@@ -35,10 +35,10 @@ module CASClient
             
             last_st = controller.session[:cas_last_valid_ticket]
             last_st_service = controller.session[:cas_last_valid_ticket_service]
-            Rails.logger.info "RubyCAS filter--------------last_st #{last_st}, last_st_service #{last_st_service}"
+            log.info "RubyCAS filter--------------last_st #{last_st}, last_st_service #{last_st_service}"
 
             if single_sign_out(controller)
-              Rails.logger.info "RubyCAS filter-------------- single_sign_out"
+              log.info "RubyCAS filter-------------- single_sign_out"
               controller.send(:render, plain: 'CAS Single-Sign-Out request intercepted.')
               return false
             end
@@ -49,7 +49,7 @@ module CASClient
                 last_st == st.ticket &&
                 last_st_service == st.service
 
-              Rails.logger.info "RubyCAS filter-------------- Re-using previously validated ticket since the ticket id and service are the same."
+              log.info "RubyCAS filter-------------- Re-using previously validated ticket since the ticket id and service are the same."
               # warn() rather than info() because we really shouldn't be re-validating the same ticket.
               # The only situation where this is acceptable is if the user manually does a refresh and 
               # the same ticket happens to be in the URL.
@@ -65,7 +65,7 @@ module CASClient
               # This behaviour can be disabled (so that every request is routed through the CAS server) by setting
               # the :authenticate_on_every_request config option to true. However, this is not desirable since
               # it will almost certainly break POST request, AJAX calls, etc.
-              Rails.logger.info "RubyCAS filter-------------- Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
+              log.info "RubyCAS filter-------------- Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
                                   "Previous ticket #{last_st.inspect} will be re-used."
               log.debug "Existing local CAS session detected for #{controller.session[client.username_session_key].inspect}. "+
                 "Previous ticket #{last_st.inspect} will be re-used."
@@ -73,11 +73,11 @@ module CASClient
             end
             
             if st
-              Rails.logger.info "RubyCAS filter--------------if st: #{st}"
+              log.info "RubyCAS filter--------------if st: #{st}"
               client.validate_service_ticket(st) unless st.has_been_validated?
 
               if st.is_valid?
-                Rails.logger.info "RubyCAS filter--------------st.is_valid?"
+                log.info "RubyCAS filter--------------st.is_valid?"
                 #if is_new_session
                   log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{st.user.inspect} is VALID.")
                   controller.session[client.username_session_key] = st.user.dup
@@ -102,7 +102,7 @@ module CASClient
                 controller.session[:cas_last_valid_ticket_service] = st.service
                 
                 if st.pgt_iou
-                  Rails.logger.info "RubyCAS filter--------------st.pgt_iou"
+                  log.info "RubyCAS filter--------------st.pgt_iou"
                   unless controller.session[:cas_pgt] && controller.session[:cas_pgt].ticket && controller.session[:cas_pgt].iou == st.pgt_iou
                     log.info("Receipt has a proxy-granting ticket IOU. Attempting to retrieve the proxy-granting ticket...")
                     pgt = client.retrieve_proxy_granting_ticket(st.pgt_iou)
@@ -121,7 +121,7 @@ module CASClient
                 end
                 return true
               else
-                Rails.logger.info "RubyCAS filter--------------failed validation -- #{st.failure_code}: #{st.failure_message}"
+                log.info "RubyCAS filter--------------failed validation -- #{st.failure_code}: #{st.failure_message}"
                 log.warn("Ticket #{st.ticket.inspect} failed validation -- #{st.failure_code}: #{st.failure_message}")
                 unauthorized!(controller, st)
                 return false
@@ -141,7 +141,7 @@ module CASClient
                   log.warn "The CAS client is NOT configured to allow gatewaying, yet this request was gatewayed. Something is not right!"
                 end
               end
-              Rails.logger.info "RubyCAS filter--------------unauthorized!"
+              log.info "RubyCAS filter--------------unauthorized!"
 
               unauthorized!(controller)
               return false
