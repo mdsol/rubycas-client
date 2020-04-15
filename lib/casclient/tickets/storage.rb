@@ -64,7 +64,7 @@ module CASClient
         def session_id_from_controller(controller)
           session_id = controller.request.session_options[:id] || controller.session.session_id
           raise CASClient::CASException, "Failed to extract session_id from controller" if session_id.nil?
-          session_id
+          session_id&.public_id # See https://github.com/rails/rails/issues/38039
         end
       end
 
