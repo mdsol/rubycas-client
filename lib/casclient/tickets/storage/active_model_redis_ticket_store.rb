@@ -104,11 +104,17 @@ module CASClient
         end
 
         def self.client(config)
+          puts "rubycas-client===========> #{config.inspect}"
+          log.info("rubycas-client===========> #{config.inspect}")
           memcache_url = config && config[:dalli_settings] && "#{config[:dalli_settings]['host']}:#{config[:dalli_settings]['port']}" || 'localhost:6379'
           options = config[:dalli_settings].clone if config.has_key?(:dalli_settings)
           options.delete("host") if options && options.has_key?("host")
           options.delete("port") if options && options.has_key?("port")
           @@options = options || {}
+          puts "rubycas-client======@@redis_client=====> #{@@redis_client.inspect}"
+          puts "rubycas-client======url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
+          log.info "rubycas-client======@@redis_client=====> #{@@redis_client.inspect}"
+          log.info "rubycas-client======url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
           @@redis_client ||= Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
         end
 
