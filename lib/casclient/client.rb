@@ -47,6 +47,8 @@ module CASClient
           ::ACTIVE_RECORD_TICKET_STORE
         when :active_model_memcache_ticket_store
           ::ACTIVE_MODEL_MEMCACHE_TICKET_STORE
+        when :active_model_redis_ticket_store
+          ::ACTIVE_MODEL_REDIS_TICKET_STORE
         else
           conf[:ticket_store]
       end

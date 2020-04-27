@@ -80,6 +80,7 @@ end
 
 autoload :ACTIVE_RECORD_TICKET_STORE, 'casclient/tickets/storage/active_record_ticket_store'
 autoload :ACTIVE_MODEL_MEMCACHE_TICKET_STORE, 'casclient/tickets/storage/active_model_memcache_ticket_store'
+autoload :ACTIVE_MODEL_REDIS_TICKET_STORE, 'casclient/tickets/storage/active_model_redis_ticket_store'
 if defined?(Rails)
   require 'casclient/frameworks/rails/filter'
   require 'casclient/frameworks/rails/cas_proxy_callback_controller'
