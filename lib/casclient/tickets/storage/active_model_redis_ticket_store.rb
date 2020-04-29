@@ -111,7 +111,6 @@ module CASClient
             @@options = options || {}
 
             puts "rubycas-client======@client=====> #{@client.inspect}, url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
-            log.info "rubycas-client======@client=====> #{@client.inspect}, url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
 
             Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
           end
