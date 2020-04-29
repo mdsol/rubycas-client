@@ -102,6 +102,8 @@ module CASClient
         end
 
         def self.client(config)
+          puts "=======================MEMCACHE STORE BAD!!!==============================="
+          Rails.logger.info "=======================MEMCACHE STORE BAD!!!==============================="
           memcache_url = config && config[:dalli_settings] && "#{config[:dalli_settings]['host']}:#{config[:dalli_settings]['port']}" || 'localhost:11211'
           options = config[:dalli_settings].clone if config.has_key?(:dalli_settings)
           options.delete("host") if options && options.has_key?("host")
@@ -174,8 +176,7 @@ module CASClient
         include ActiveModel
         attr_accessor :pgt_iou, :pgt_id
 
-        # TODO: testing if this is where the random dalli is coming from
-        # @@dalli = Dalli::Client.new
+        @@dalli = Dalli::Client.new
 
         def initialize(options={})
           @pgt_iou = options[:pgt_iou]
