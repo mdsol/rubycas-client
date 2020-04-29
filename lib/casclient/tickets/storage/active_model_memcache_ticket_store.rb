@@ -174,7 +174,8 @@ module CASClient
         include ActiveModel
         attr_accessor :pgt_iou, :pgt_id
 
-        @@dalli = Dalli::Client.new
+        # TODO: testing if this is where the random dalli is coming from
+        # @@dalli = Dalli::Client.new
 
         def initialize(options={})
           @pgt_iou = options[:pgt_iou]
