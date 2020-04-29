@@ -4,12 +4,9 @@ module CASClient
   module Tickets
     module Storage
 
-      # TODO: this is based on ActiveModelRedisTicketStore. there could be issues but most of the logic seems independent of memcached vs redis.
       class ActiveModelRedisTicketStore < AbstractTicketStore
-        def initialize(config={})
-          log.info("ActiveModelRedisTicketStore adapted for redis")
-          config ||= {}
-          RedisSessionStore.client(config) if config
+        def initialize(config = {})
+          RedisSessionStore.setup_client(config || {})
         end
 
         def store_service_session_lookup(st, controller)
@@ -87,6 +84,9 @@ module CASClient
       class RedisSessionStore
         include ActiveModel
         attr_accessor :session_id, :service_ticket, :data
+        class << self
+          attr_accessor :client
+        end
 
         def initialize(options={})
           options.each do |key, val|
@@ -103,27 +103,23 @@ module CASClient
           self.instance_variable_set("@#{key}", value)
         end
 
-        def self.client(config)
-          puts "rubycas-client===========> #{config.inspect}"
-          log.info("rubycas-client===========> #{config.inspect}")
+        def self.setup_client(config)
+          @client ||= begin
+            options = config[:dalli_settings].clone if config.has_key?(:dalli_settings)
+            options.delete("host") if options && options.has_key?("host")
+            options.delete("port") if options && options.has_key?("port")
+            @@options = options || {}
 
-          memcache_url = config && config[:dalli_settings] && "#{config[:dalli_settings]['host']}:#{config[:dalli_settings]['port']}" || 'localhost:6379'
-          options = config[:dalli_settings].clone if config.has_key?(:dalli_settings)
-          options.delete("host") if options && options.has_key?("host")
-          options.delete("port") if options && options.has_key?("port")
-          @@options = options || {}
+            puts "rubycas-client======@client=====> #{@client.inspect}, url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
+            log.info "rubycas-client======@client=====> #{@client.inspect}, url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
 
-          puts "rubycas-client======@@redis_client=====> #{@@redis_client.inspect}"
-          puts "rubycas-client======url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
-          log.info "rubycas-client======@@redis_client=====> #{@@redis_client.inspect}"
-          log.info "rubycas-client======url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
-
-          @@redis_client ||= Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
+            Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
+          end
         end
 
         def self.find_by_session_id(session_id)
           session_id = "#{namespaced_key(session_id)}"
-          session = @@redis_client.get(session_id)
+          session = @client.get(session_id)
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
           if session
@@ -134,7 +130,7 @@ module CASClient
         end
 
         def self.find_by_service_ticket(service_ticket)
-          session_id = @@redis_client.get("#{namespaced_key(service_ticket)}")
+          session_id = @client.get("#{namespaced_key(service_ticket)}")
           session = RedisSessionStore.find_by_session_id(session_id) if session_id
           session.session_id if session
         end
@@ -154,13 +150,13 @@ module CASClient
         # service_ticket => session_id
         # session_id => {session_data}
         def save
-          @@redis_client.set("#{namespaced_key(self.service_ticket)}", self.session_id)
-          @@redis_client.set("#{namespaced_key(self.session_id)}", self.session_data)
+          self.class.client.set("#{namespaced_key(self.service_ticket)}", self.session_id)
+          self.class.client.set("#{namespaced_key(self.session_id)}", self.session_data)
         end
 
         def destroy
-          @@redis_client.delete("#{namespaced_key(self.service_ticket)}")
-          @@redis_client.delete("#{namespaced_key(self.session_id)}")
+          self.class.client.delete("#{namespaced_key(self.service_ticket)}")
+          self.class.client.delete("#{namespaced_key(self.session_id)}")
         end
 
         alias_method :save!, :save
@@ -185,31 +181,27 @@ module CASClient
         include ActiveModel
         attr_accessor :pgt_iou, :pgt_id
 
-        puts "rubycas-client===Pgtiou========> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
-        log.info("rubycas-client===Pgtiou========> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}")
-        @@redis_client = Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
-
         def initialize(options={})
           @pgt_iou = options[:pgt_iou]
           @pgt_id = options[:pgt_id]
         end
 
         def self.find_by_pgt_iou(pgt_iou)
-          pgtiou = @@redis_client.get(pgt_iou)
+          pgtiou = RedisSessionStore.client.get(pgt_iou)
           Pgtiou.new(pgtiou) if pgtiou
         end
 
         def self.create(options)
           pgtiou = Pgtiou.new(options)
-          @@redis_client.set(pgtiou.pgt_iou, pgtiou.session_data)
+          RedisSessionStore.client.set(pgtiou.pgt_iou, pgtiou.session_data)
         end
 
         def session_data
-          {pgt_iou: self.pgt_iou, pgt_id: self.pgt_id}
+          {pgt_iou: pgt_iou, pgt_id: pgt_id}
         end
 
         def destroy
-          @@redis_client.delete(self.pgt_iou)
+          RedisSessionStore.client.delete(pgt_iou)
         end
       end
     end
