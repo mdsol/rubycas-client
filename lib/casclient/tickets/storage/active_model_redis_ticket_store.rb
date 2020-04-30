@@ -105,8 +105,9 @@ module CASClient
 
         def self.setup_client(config)
           @client ||= begin
-            @namespace = config[:dalli_settings] && config[:dalli_settings][:namespace]
+            @namespace = config[:dalli_settings] && config[:dalli_settings]['namespace']
             puts "@namespace----------> #{@namespace}"
+            Rails.logger.info "@namespace----------> #{@namespace}"
             Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
           end
         end
@@ -160,6 +161,7 @@ module CASClient
         # Hence having the same name methods for both class and instance.
         def self.namespaced_key(key)
           puts "====namespaced_key=========> #{@namespace ? "#{@namespace}:#{key}" : key.to_s}"
+          Rails.logger.info "====namespaced_key=========> #{@namespace ? "#{@namespace}:#{key}" : key.to_s}"
           @namespace ? "#{@namespace}:#{key}" : key.to_s
         end
 
