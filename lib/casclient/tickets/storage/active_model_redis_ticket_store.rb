@@ -70,13 +70,13 @@ module CASClient
         end
 
         private
+
         def update_all_sessions(session_id, service_ticket)
           session = RedisSessionStore.find_by_session_id(session_id)
-          session["session_id"] = session_id
-          session["service_ticket"] = service_ticket
+          session['session_id'] = session_id
+          session['service_ticket'] = service_ticket
           session.save
         end
-
       end
 
       ::ACTIVE_MODEL_REDIS_TICKET_STORE = ActiveModelRedisTicketStore
@@ -84,6 +84,7 @@ module CASClient
       class RedisSessionStore
         include ActiveModel
         attr_accessor :session_id, :service_ticket, :data
+
         class << self
           attr_accessor :client
         end
@@ -106,8 +107,6 @@ module CASClient
         def self.setup_client(config)
           @client ||= begin
             @namespace = config[:dalli_settings] && config[:dalli_settings]['namespace']
-            puts "@namespace----------> #{@namespace}"
-            Rails.logger.info "@namespace----------> #{@namespace}"
             Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
           end
         end
@@ -117,15 +116,11 @@ module CASClient
           session = @client.get(session_id)
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
-          if session
-            RedisSessionStore.new(session)
-          else
-            return false
-          end
+          session ? RedisSessionStore.new(session) : false
         end
 
         def self.find_by_service_ticket(service_ticket)
-          session_id = @client.get("#{namespaced_key(service_ticket)}")
+          session_id = @client.get(namespaced_key(service_ticket))
           session = RedisSessionStore.find_by_session_id(session_id) if session_id
           session.session_id if session
         end
@@ -136,7 +131,7 @@ module CASClient
           data
         end
 
-        # As Memcache is a key value store we are storing the session in the form of
+        # As Redis is a key value store we are storing the session in the form of
         # session_id => {session_data}
         #
         # We do also need to be able to retrieve the session using just the service_ticket, and as
@@ -145,13 +140,20 @@ module CASClient
         # service_ticket => session_id
         # session_id => {session_data}
         def save
-          self.class.client.set("#{namespaced_key(self.service_ticket)}", self.session_id)
-          self.class.client.set("#{namespaced_key(self.session_id)}", self.session_data)
+          puts              "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
+          Rails.logger.info "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
+          puts              "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
+          Rails.logger.info "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
+          puts              "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
+          Rails.logger.info "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
+
+          self.class.client.set(namespaced_key(self.service_ticket), self.session_id)
+          self.class.client.set(namespaced_key(self.session_id), self.session_data)
         end
 
         def destroy
-          self.class.client.delete("#{namespaced_key(self.service_ticket)}")
-          self.class.client.delete("#{namespaced_key(self.session_id)}")
+          self.class.client.delete(namespaced_key(self.service_ticket))
+          self.class.client.delete(namespaced_key(self.session_id))
         end
 
         alias_method :save!, :save
@@ -160,8 +162,6 @@ module CASClient
         # well as instance methods.
         # Hence having the same name methods for both class and instance.
         def self.namespaced_key(key)
-          puts "====namespaced_key=========> #{@namespace ? "#{@namespace}:#{key}" : key.to_s}"
-          Rails.logger.info "====namespaced_key=========> #{@namespace ? "#{@namespace}:#{key}" : key.to_s}"
           @namespace ? "#{@namespace}:#{key}" : key.to_s
         end
 
