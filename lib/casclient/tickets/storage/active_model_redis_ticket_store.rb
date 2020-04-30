@@ -112,7 +112,7 @@ module CASClient
         end
 
         def self.find_by_session_id(session_id)
-          session_id = "#{namespaced_key(session_id)}"
+          session_id = namespaced_key(session_id)
           session = @client.get(session_id)
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
@@ -127,8 +127,25 @@ module CASClient
 
         def session_data
           data = {}
-          self.instance_variables.each{|key| data[key.to_s.sub(/\A@/, '')] = self[key.to_s.sub(/\A@/, '')]}
+          self.instance_variables.each do |key|
+            data[key.to_s.sub(/\A@/, '')] = self[key.to_s.sub(/\A@/, '')]
+          end
+          
+          puts              "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
+          puts              "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
+          Rails.logger.info "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
+          Rails.logger.info "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
+
+          puts              "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
+          puts              "--------->  client #{client.inspect[0..1000]}"
+          Rails.logger.info "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
+          Rails.logger.info "--------->  client #{client.inspect[0..1000]}"
+
           data
+        end
+
+        def client
+          self.class.client
         end
 
         # As Redis is a key value store we are storing the session in the form of
@@ -140,20 +157,13 @@ module CASClient
         # service_ticket => session_id
         # session_id => {session_data}
         def save
-          puts              "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
-          Rails.logger.info "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
-          puts              "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
-          Rails.logger.info "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
-          puts              "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
-          Rails.logger.info "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
-
-          self.class.client.set(namespaced_key(self.service_ticket), self.session_id)
-          self.class.client.set(namespaced_key(self.session_id), self.session_data)
+          client.set(namespaced_key(service_ticket), session_id)
+          client.set(namespaced_key(session_id), session_data)
         end
 
         def destroy
-          self.class.client.delete(namespaced_key(self.service_ticket))
-          self.class.client.delete(namespaced_key(self.session_id))
+          client.delete(namespaced_key(service_ticket))
+          client.delete(namespaced_key(session_id))
         end
 
         alias_method :save!, :save
