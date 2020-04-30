@@ -102,8 +102,6 @@ module CASClient
         end
 
         def self.client(config)
-          puts "=======================MEMCACHE STORE BAD!!!==============================="
-          Rails.logger.info "=======================MEMCACHE STORE BAD!!!==============================="
           memcache_url = config && config[:dalli_settings] && "#{config[:dalli_settings]['host']}:#{config[:dalli_settings]['port']}" || 'localhost:11211'
           options = config[:dalli_settings].clone if config.has_key?(:dalli_settings)
           options.delete("host") if options && options.has_key?("host")

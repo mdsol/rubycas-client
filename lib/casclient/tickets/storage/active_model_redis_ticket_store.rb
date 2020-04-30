@@ -56,7 +56,7 @@ module CASClient
         def save_pgt_iou(pgt_iou, pgt)
           raise CASClient::CASException.new('Invalid pgt_iou') unless pgt_iou
           raise CASClient::CASException.new('Invalid pgt') unless pgt
-          pgtiou = Pgtiou.create(pgt_iou: pgt_iou, pgt_id: pgt)
+          Pgtiou.create(pgt_iou: pgt_iou, pgt_id: pgt)
         end
 
         def retrieve_pgt(pgt_iou)
@@ -105,13 +105,8 @@ module CASClient
 
         def self.setup_client(config)
           @client ||= begin
-            options = config[:dalli_settings].clone if config.has_key?(:dalli_settings)
-            options.delete("host") if options && options.has_key?("host")
-            options.delete("port") if options && options.has_key?("port")
-            @@options = options || {}
-
-            puts "rubycas-client======@client=====> #{@client.inspect}, url=====> #{"rediss://#{config[:dalli_settings]['host']}:6379/0"}"
-
+            @namespace = config[:dalli_settings] && config[:dalli_settings][:namespace]
+            puts "@namespace----------> #{@namespace}"
             Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
           end
         end
@@ -164,11 +159,8 @@ module CASClient
         # well as instance methods.
         # Hence having the same name methods for both class and instance.
         def self.namespaced_key(key)
-          if @@options['namespace']
-            "#{@@options['namespace']}:#{key}"
-          else
-            key.to_s
-          end
+          puts "====namespaced_key=========> #{@namespace ? "#{@namespace}:#{key}" : key.to_s}"
+          @namespace ? "#{@namespace}:#{key}" : key.to_s
         end
 
         def namespaced_key(key)
