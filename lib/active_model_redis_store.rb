@@ -19,25 +19,33 @@ module ActionDispatch
       end
 
       # TODO: needs to be adjusted for redis
-      # # The service ticket is also being stored in Memcache in the form -
-      # # service_ticket => session_id
-      # # session_id => {session_data}
-      # # Need to ensure that when a session is being destroyed - we also clean up the service-ticket
-      # # related data prior to letting the session be destroyed.
-      # def destroy_session(env, session_id, options)
-      #   if @pool.exist?(session_id)
-      #     session = @pool.get(session_id)
-      #     if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
-      #       begin
-      #         @pool.delete(session["service_ticket"])
-      #       rescue => e
-      #         Rails.logger.warn("error in destroy_session: #{$!.message}")
-      #         raise if @raise_errors
-      #       end
-      #     end
-      #   end
-      #   super(env, session_id, options)
-      # end
+      # The service ticket is also being stored in Memcache in the form -
+      # service_ticket => session_id
+      # session_id => {session_data}
+      # Need to ensure that when a session is being destroyed - we also clean up the service-ticket
+      # related data prior to letting the session be destroyed.
+      def destroy_session(env, session_id, options)
+        Rails.logger.info("------destroy_session-------->  #{env.inspect[0..1000]}, session_id: #{session_id}, #{options.inspect}")
+
+        # with_lock(env) do
+        #   with { |c| c.del(session_id) }
+        #   generate_sid unless options[:drop]
+        # end
+
+
+        # if @pool.exist?(session_id)
+        #   session = @pool.get(session_id)
+        #   if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
+        #     begin
+        #       @pool.delete(session["service_ticket"])
+        #     rescue => e
+        #       Rails.logger.warn("error in destroy_session: #{$!.message}")
+        #       raise if @raise_errors
+        #     end
+        #   end
+        # end
+        super(env, session_id, options)
+      end
 
       # TODO: apparently not needed for redis
       # Patch Rack 2.0 changes that broke ActionDispatch.
