@@ -11,6 +11,7 @@ module ActionControllerHelpers
     request ||= mock_post_request
     request.stub(:query_parameters) {query_parameters}
     request.stub(:path_parameters) {{}}
+    request.stub(:env) {{}}
     controller = double("Controller")
     controller.stub(:session) {session}
     controller.stub(:env) {{}}

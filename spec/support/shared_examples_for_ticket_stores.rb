@@ -58,6 +58,9 @@ shared_examples "a ticket store interacting with sessions" do
           if subject.instance_of?(CASClient::Tickets::Storage::ActiveModelMemcacheTicketStore)
             dc = Dalli::Client.new
             dc.get(session.session_id).should be_nil
+          elsif subject.instance_of?(CASClient::Tickets::Storage::ActiveModelRedisTicketStore)
+            dc = Redis.new
+            dc.get(session.session_id).should be_nil
           else
             ActiveRecord::SessionStore.session_class.find_by_session_id(session.session_id).should be_nil
           end
@@ -96,6 +99,12 @@ shared_examples "a ticket store" do
       memcache_data = CASClient::Tickets::Storage::MemcacheSessionStore.new("session_id" => "#{session_id}", "data" => {})
       dc.set("session#{session_id}", memcache_data)
       memcache_data
+    elsif ticket_store.is_a?(CASClient::Tickets::Storage::ActiveModelRedisTicketStore)
+      redis = Redis.new
+      session_id = rand(1000)
+      cache_data = CASClient::Tickets::Storage::RedisSessionStore.new("session_id" => "#{session_id}", "data" => {})
+      redis.set("session#{session_id}", cache_data)
+      cache_data
     else
       ActiveRecord::SessionStore::Session.create!(:session_id => "session#{rand(1000)}", :data => {})
     end

@@ -1,5 +1,5 @@
 require 'casclient/frameworks/rails/filter'
-
+require 'redis'
 module CASClient
   module Tickets
     module Storage
@@ -56,12 +56,12 @@ module CASClient
         def save_pgt_iou(pgt_iou, pgt)
           raise CASClient::CASException.new('Invalid pgt_iou') unless pgt_iou
           raise CASClient::CASException.new('Invalid pgt') unless pgt
-          Pgtiou.create(pgt_iou: pgt_iou, pgt_id: pgt)
+          RedisPgtiou.create(pgt_iou: pgt_iou, pgt_id: pgt)
         end
 
         def retrieve_pgt(pgt_iou)
           raise CASException, 'No pgt_iou specified. Cannot retrieve the pgt.' unless pgt_iou
-          pgtiou = Pgtiou.find_by_pgt_iou(pgt_iou)
+          pgtiou = RedisPgtiou.find_by_pgt_iou(pgt_iou)
           raise CASException, 'Invalid pgt_iou specified. Perhaps this pgt has already been retrieved?' unless pgtiou
 
           pgt = pgtiou.pgt_id
@@ -107,13 +107,15 @@ module CASClient
         def self.setup_client(config)
           @client ||= begin
             @namespace = config[:dalli_settings] && config[:dalli_settings]['namespace']
-            Redis.new(url: "rediss://#{config[:dalli_settings]['host']}:6379/0")
+            host = (config[:dalli_settings] && config[:dalli_settings]['host']) || 'localhost'
+            Redis.new(url: "rediss://#{host}:6379/0")
           end
         end
 
         def self.find_by_session_id(session_id)
           session_id = namespaced_key(session_id)
           session = @client.get(session_id)
+
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
           session ? RedisSessionStore.new(session) : false
@@ -130,17 +132,6 @@ module CASClient
           self.instance_variables.each do |key|
             data[key.to_s.sub(/\A@/, '')] = self[key.to_s.sub(/\A@/, '')]
           end
-          
-          puts              "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
-          puts              "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
-          Rails.logger.info "--------->  namespaced_key(self.service_ticket) #{namespaced_key(self.service_ticket)}, self.session_id #{self.session_id} "
-          Rails.logger.info "--------->  namespaced_key(service_ticket) #{namespaced_key(service_ticket)}, session_id #{session_id} "
-
-          puts              "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
-          puts              "--------->  client #{client.inspect[0..1000]}"
-          Rails.logger.info "--------->  self.class.client #{self.class.client.inspect[0..1000]}"
-          Rails.logger.info "--------->  client #{client.inspect[0..1000]}"
-
           data
         end
 
@@ -158,6 +149,7 @@ module CASClient
         # session_id => {session_data}
         def save
           client.set(namespaced_key(service_ticket), session_id)
+          session_data['service_ticket'] = 'blahblah'
           client.set(namespaced_key(session_id), session_data)
         end
 
@@ -180,7 +172,7 @@ module CASClient
         end
       end
 
-      class Pgtiou
+      class RedisPgtiou
         include ActiveModel
         attr_accessor :pgt_iou, :pgt_id
 
@@ -191,11 +183,11 @@ module CASClient
 
         def self.find_by_pgt_iou(pgt_iou)
           pgtiou = RedisSessionStore.client.get(pgt_iou)
-          Pgtiou.new(pgtiou) if pgtiou
+          RedisPgtiou.new(pgtiou) if pgtiou
         end
 
         def self.create(options)
-          pgtiou = Pgtiou.new(options)
+          pgtiou = RedisPgtiou.new(options)
           RedisSessionStore.client.set(pgtiou.pgt_iou, pgtiou.session_data)
         end
 

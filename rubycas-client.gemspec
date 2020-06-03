@@ -19,6 +19,8 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'activesupport', '>= 0'
   s.add_runtime_dependency 'dalli', '>= 2.0'
+  s.add_runtime_dependency 'redis', '>= 4.1'
+  # s.add_runtime_dependency 'mock_redis'#, '>= 4.1'
   s.add_runtime_dependency 'dice_bag', '>= 0.9', '< 2.0'
 
   s.add_development_dependency 'json', '>= 0'

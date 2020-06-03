@@ -13,7 +13,7 @@ describe CASClient::Tickets::Storage::ActiveModelMemcacheTicketStore do
 
       @memcache_mock_store = {}
 
-      service_ticket = CASClient::ServiceTicket.new("ST-id", "ActiveModelMemcacheTicketStore")      
+      service_ticket = CASClient::ServiceTicket.new("ST-id", "ActiveModelMemcacheTicketStore")
       subject.store_service_session_lookup(service_ticket, controller)
       new_session = CASClient::Tickets::Storage::MemcacheSessionStore.find_by_session_id("nonexistant_session")
       new_session.service_ticket.should eql("ST-id")

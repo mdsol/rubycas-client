@@ -13,6 +13,7 @@ end
 
 require 'database_cleaner'
 
+# TODO: see if there's a way to only do the setup/teardown for the current type of session store, instead of all 3..
 RSpec.configure do |config|
   config.mock_with :rspec
   config.mock_framework = :rspec
@@ -30,12 +31,13 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.start
+    ActiveModelRedisTicketStoreHelpers.setup_redis_store
     ActiveModelMemcacheTicketStoreHelpers.setup_memcache_store
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
+    ActiveModelRedisTicketStoreHelpers.teardown_redis_store
     ActiveModelMemcacheTicketStoreHelpers.teardown_memcache_store
   end
 end
-
