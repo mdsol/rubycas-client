@@ -26,24 +26,17 @@ module ActionDispatch
       # related data prior to letting the session be destroyed.
       def destroy_session(env, session_id, options)
         Rails.logger.info("------destroy_session-------->  #{env.inspect[0..1000]}, session_id: #{session_id}, #{options.inspect}")
-
-        # with_lock(env) do
-        #   with { |c| c.del(session_id) }
-        #   generate_sid unless options[:drop]
-        # end
-
-
-        # if @pool.exist?(session_id)
-        #   session = @pool.get(session_id)
-        #   if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
-        #     begin
-        #       @pool.delete(session["service_ticket"])
-        #     rescue => e
-        #       Rails.logger.warn("error in destroy_session: #{$!.message}")
-        #       raise if @raise_errors
-        #     end
-        #   end
-        # end
+        if session = with { |client| client.get(session_id) }
+          if session.has_key?('service_ticket')
+            Rails.logger.info("------session['service_ticket']----->  #{session['service_ticket']}")
+            begin
+              with { |client| client.del(session['service_ticket']) }
+            rescue => e
+              Rails.logger.warn("error in destroy_session: #{$!.message}")
+              raise if @raise_errors
+            end
+          end
+        end
         super(env, session_id, options)
       end
 
