@@ -1,17 +1,9 @@
 require 'spec_helper'
-# require 'mock_redis'
 require 'casclient/tickets/storage/active_model_redis_ticket_store'
 require 'casclient/tickets/storage/active_model_memcache_ticket_store'
 require 'casclient/tickets/storage/active_record_ticket_store' # TODO: remove this. only needed to make before :suite pass in spec_helper. (and maybe clean up spec_helper)
 
 describe CASClient::Tickets::Storage::ActiveModelRedisTicketStore do
-
-  before do
-    # redis_instance = MockRedis.new
-    # Redis.stub(:new).and_return(redis_instance)
-    # Redis::Store.stub(:new).and_return(redis_instance)
-  end
-
   it_should_behave_like "a ticket store"
 
   describe 'store_service_session_lookup' do

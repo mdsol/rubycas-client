@@ -149,7 +149,6 @@ module CASClient
         # session_id => {session_data}
         def save
           client.set(namespaced_key(service_ticket), session_id)
-          session_data['service_ticket'] = 'blahblah'
           client.set(namespaced_key(session_id), session_data)
         end
 
