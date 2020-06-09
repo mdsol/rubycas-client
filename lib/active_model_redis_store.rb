@@ -13,6 +13,7 @@ module ActionDispatch
         if session = with { |c| c.get(sid) }
           # Copy session_id and service_ticket into the session_data
           %w(session_id service_ticket).each { |key| session_data[key] = session[key] if session[key] }
+          session['TESTKEY'] = '12345'
           Rails.logger.info("------session_data-------->  #{session_data}")
         end
         super(env, sid, session_data, options)
