@@ -7,7 +7,7 @@ require 'redis-rack'
 module ActionDispatch
   module Session
 
-    class ActiveModelRedisStore < ActionDispatch::Session::RedisStore
+    class ActiveModelRedisStore < ActionDispatch::Session::AbstractStore
       def set_session(env, sid, session_data, options = nil)
         Rails.logger.info("------set_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
         if session = with { |c| c.get(sid) }
