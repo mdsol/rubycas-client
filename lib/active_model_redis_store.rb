@@ -42,6 +42,10 @@ module ActionDispatch
         super(env, session_id, options)
       end
 
+      def get_session(env, sid)
+        super
+      end
+
       # TODO: apparently not needed for redis
       # Patch Rack 2.0 changes that broke ActionDispatch.
       alias_method :find_session, :get_session
