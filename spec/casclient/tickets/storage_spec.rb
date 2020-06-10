@@ -3,6 +3,34 @@ require 'support/local_hash_ticket_store'
 require 'fileutils'
 
 describe CASClient::Tickets::Storage::AbstractTicketStore do
+  describe "#session_id_from_controller" do
+    it 'should return string session id from session options' do
+      stub = Object.new
+      session_id = 'mock_session_id'
+      stub.stub_chain(:request, :session_options).and_return({ id: session_id })
+      expect(subject.send(:session_id_from_controller, stub)).to eq(session_id)
+    end
+    it 'should cast session id to string from session options' do
+      stub = Object.new
+      session_id = 42
+      stub.stub_chain(:request, :session_options).and_return({ id: session_id })
+      expect(subject.send(:session_id_from_controller, stub)).to eq(session_id.to_s)
+    end
+    it 'should fallback to session object' do
+      stub = Object.new
+      session_id = 'mock_session_id'
+      stub.stub_chain(:request, :session_options).and_return({})
+      stub.stub_chain(:session, :session_id).and_return(session_id)
+      expect(subject.send(:session_id_from_controller, stub)).to eq(session_id)
+    end
+    it 'should raise exception when no session id is found' do
+      stub = Object.new
+      stub.stub_chain(:request, :session_options).and_return({})
+      stub.stub_chain(:session, :session_id).and_return(nil)
+      expect { subject.send(:session_id_from_controller, stub) }.to raise_error(CASClient::CASException)
+    end
+  end
+
   describe "#store_service_session_lookup" do
     it "should raise an exception" do
       expect { subject.store_service_session_lookup("service_ticket", mock_controller_with_session) }.to raise_exception 'Implement this in a subclass!'

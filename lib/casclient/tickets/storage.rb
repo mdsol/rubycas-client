@@ -62,7 +62,12 @@ module CASClient
         end
 
         def session_id_from_controller(controller)
-          session_id = controller.request.session_options[:id] || controller.session.session_id
+          session_id = nil
+          if controller.request.session_options[:id].present?
+            session_id = controller.request.session_options[:id].to_s
+          else
+            session_id = controller.session.session_id
+          end
           raise CASClient::CASException, "Failed to extract session_id from controller" if session_id.nil?
           session_id
         end
