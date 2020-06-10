@@ -15,11 +15,14 @@ module ActionDispatch
     class ActiveModelMemcacheStore < ActionDispatch::Session::DalliStore
 
       def set_session(env, sid, session_data, options = nil)
+        Rails.logger.info("memcached set_session ------------------> sid: #{sid}, session_data: #{session_data}")
+
         if @pool.exist?(sid)
           session = @pool.get(sid)
           # Copy session_id and service_ticket into the session_data
           %w(session_id service_ticket).each { |key| session_data[key] = session[key] if session[key] }
         end
+        session_data['TESTKEY'] = 'testvalue'
         super(env, sid, session_data, options)
       end
 
