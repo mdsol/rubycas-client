@@ -7,6 +7,7 @@ require 'redis-rack'
 module ActionDispatch
   module Session
 
+    # class ActiveModelRedisStore < ActionDispatch::Session::RedisStore
     class ActiveModelRedisStore < ActionDispatch::Session::AbstractStore
       def set_session(env, sid, session_data, options = nil)
         Rails.logger.info("------set_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
@@ -43,9 +44,9 @@ module ActionDispatch
 
       # TODO: apparently not needed for redis
       # Patch Rack 2.0 changes that broke ActionDispatch.
-      # alias_method :find_session, :get_session
-      # alias_method :write_session, :set_session
-      # alias_method :delete_session, :destroy_session
+      alias_method :find_session, :get_session
+      alias_method :write_session, :set_session
+      alias_method :delete_session, :destroy_session
 
     end
   end
