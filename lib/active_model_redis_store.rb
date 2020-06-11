@@ -42,15 +42,15 @@ module ActionDispatch
         super(env, session_id, options)
       end
 
-      # def find_session(env, sid)
-      #   session = with { |client| client.get(sid) }
-      #   Rails.logger.info("------find_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
-      #   session
-      # end
+      def find_session(env, sid)
+        session = with { |client| client.get(sid) }
+        Rails.logger.info("------find_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
+        session
+      end
 
       # TODO: apparently not needed for redis
       # Patch Rack 2.0 changes that broke ActionDispatch.
-      alias_method :find_session, :get_session
+      # alias_method :find_session, :get_session
       alias_method :write_session, :set_session
       alias_method :delete_session, :destroy_session
 
