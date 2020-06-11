@@ -17,7 +17,7 @@ module ActionDispatch
           session['TESTKEY'] = '12345'
           Rails.logger.info("------session_data-------->  #{session_data}")
         end
-        super(env, sid, session_data, options)
+        write_session(env, sid, session_data, options)
       end
 
       # TODO: needs to be adjusted for redis
@@ -39,7 +39,7 @@ module ActionDispatch
             end
           end
         end
-        super(env, session_id, options)
+        delete_session(env, session_id, options)
       end
 
       def find_session(env, sid)
@@ -51,8 +51,8 @@ module ActionDispatch
       # TODO: apparently not needed for redis
       # Patch Rack 2.0 changes that broke ActionDispatch.
       # alias_method :find_session, :get_session
-      alias_method :write_session, :set_session
-      alias_method :delete_session, :destroy_session
+      # alias_method :write_session, :set_session
+      # alias_method :delete_session, :destroy_session
 
     end
   end
