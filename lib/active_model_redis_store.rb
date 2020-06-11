@@ -44,8 +44,8 @@ module ActionDispatch
 
       def find_session(env, sid)
         session = with { |client| client.get(sid) }
-        Rails.logger.info("------find_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
-        session
+        Rails.logger.info("------find_session-------->  #{env.inspect[0..1000]}, sid: #{sid}, session: #{session.inspect[0..1000]}")
+        [sid, session]
       end
 
       # TODO: apparently not needed for redis
