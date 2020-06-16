@@ -9,7 +9,7 @@ module ActionDispatch
 
     class ActiveModelRedisStore < ActionDispatch::Session::RedisStore
     # class ActiveModelRedisStore < ActionDispatch::Session::AbstractStore
-      def set_session(env, sid, session_data, options = nil)
+      def write_session(env, sid, session_data, options = nil)
         Rails.logger.info("------set_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
         if session = with { |c| c.get(sid) }
           # Copy session_id and service_ticket into the session_data
