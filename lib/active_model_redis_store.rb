@@ -9,16 +9,16 @@ module ActionDispatch
 
     class ActiveModelRedisStore < ActionDispatch::Session::RedisStore
     # class ActiveModelRedisStore < ActionDispatch::Session::AbstractStore
-    #   def set_session(env, sid, session_data, options = nil)
-    #     Rails.logger.info("------set_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
-    #     if session = with { |c| c.get(sid) }
-    #       # Copy session_id and service_ticket into the session_data
-    #       %w(session_id service_ticket).each { |key| session_data[key] = session[key] if session[key] }
-    #       session['TESTKEY'] = '12345'
-    #       Rails.logger.info("------session_data-------->  #{session_data}")
-    #     end
-    #     write_session(env, sid, session_data, options)
-    #   end
+      def set_session(env, sid, session_data, options = nil)
+        Rails.logger.info("------set_session-------->  #{env.inspect[0..1000]}, sid: #{sid}")
+        if session = with { |c| c.get(sid) }
+          # Copy session_id and service_ticket into the session_data
+          %w(session_id service_ticket).each { |key| session_data[key] = session[key] if session[key] }
+          session['TESTKEY'] = '12345'
+          Rails.logger.info("------session_data-------->  #{session_data}")
+        end
+        write_session(env, sid, session_data, options)
+      end
     #
     #   # The service ticket is also being stored in Memcache in the form -
     #   # service_ticket => session_id
