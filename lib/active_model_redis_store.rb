@@ -16,8 +16,11 @@ module ActionDispatch
           %w(session_id service_ticket).each { |key| session_data[key] = session[key] if session[key] }
           session['TESTKEY'] = '12345'
           Rails.logger.info("------session_data-------->  #{session_data}")
+        else
+          Rails.logger.info("------session_data-------->  could not find session")
         end
-        write_session(env, sid, session_data, options)
+        # write_session(env, sid, session_data, options)
+        super(env, sid, session_data, options)
       end
     #
     #   # The service ticket is also being stored in Memcache in the form -
