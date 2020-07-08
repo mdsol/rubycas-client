@@ -13,6 +13,8 @@ module CASClient
           raise CASException, 'No service_ticket specified.' unless st
           raise CASException, 'No controller specified.' unless controller
 
+          log.info "store_service_session_lookup=========session_id==> #{session_id}"
+
           st = st.ticket if st.kind_of? ServiceTicket
           session_id = session_id_from_controller(controller)
           # Create a session in the DB if it hasn't already been created.
