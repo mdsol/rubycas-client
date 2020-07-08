@@ -13,13 +13,14 @@ module CASClient
           raise CASException, 'No service_ticket specified.' unless st
           raise CASException, 'No controller specified.' unless controller
 
-          log.info "store_service_session_lookup=========session_id==> #{session_id}"
-          log.info "store_service_session_lookup=========controller.env['rack.session.record']==> #{controller.env['rack.session.record'] rescue 'OOPS'}"
-          log.info "store_service_session_lookup=========controller.request.env['rack.session.record']==> #{controller.request.env['rack.session.record'] rescue 'OOPS'}"
 
           st = st.ticket if st.kind_of? ServiceTicket
           session_id = session_id_from_controller(controller)
           # Create a session in the DB if it hasn't already been created.
+
+          log.info "store_service_session_lookup=========session_id==> #{session_id}"
+          log.info "store_service_session_lookup=========controller.env['rack.session.record']==> #{controller.env['rack.session.record'] rescue 'OOPS'}"
+          log.info "store_service_session_lookup=========controller.request.env['rack.session.record']==> #{controller.request.env['rack.session.record'] rescue 'OOPS'}"
 
           unless MemcacheSessionStore.find_by_session_id(session_id)
             log.info("RubyCAS Client did not find #{session_id} in the Session Store. Creating it now!")
