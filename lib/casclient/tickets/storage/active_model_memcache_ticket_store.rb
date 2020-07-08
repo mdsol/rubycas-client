@@ -37,6 +37,7 @@ module CASClient
               raise CASException, "Unable to store session #{session_id} for service ticket #{st} in the database."
             end
           else
+            log.info "else reached update_all_sessions ================="
             update_all_sessions(session_id, st)
           end
         end
@@ -118,6 +119,7 @@ module CASClient
         def self.find_by_session_id(session_id)
           session_id = "#{namespaced_key(session_id)}"
           session = @@dalli.get(session_id)
+          log.info "found session ===============session_id==> #{session_id}"
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
           if session
