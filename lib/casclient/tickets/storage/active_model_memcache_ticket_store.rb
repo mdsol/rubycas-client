@@ -22,7 +22,7 @@ module CASClient
           log.info "store_service_session_lookup=========controller.env['rack.session.record']==> #{controller.env['rack.session.record'] rescue 'OOPS'}"
           log.info "store_service_session_lookup=========controller.request.env['rack.session.record']==> #{controller.request.env['rack.session.record'] rescue 'OOPS'}"
 
-          unless MemcacheSessionStore.find_by_session_id(session_id)
+          unless MemcacheSessionStore.find_by_session_id("#{session_id}1")
             log.info("RubyCAS Client did not find #{session_id} in the Session Store. Creating it now!")
             # We need to use .save instead of .create or the service_ticket won't be stored
             new_session = MemcacheSessionStore.new
