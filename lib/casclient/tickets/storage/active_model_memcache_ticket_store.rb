@@ -14,6 +14,8 @@ module CASClient
           raise CASException, 'No controller specified.' unless controller
 
           log.info "store_service_session_lookup=========session_id==> #{session_id}"
+          log.info "store_service_session_lookup=========controller.env['rack.session.record']==> #{controller.env['rack.session.record'] rescue 'OOPS'}"
+          log.info "store_service_session_lookup=========controller.request.env['rack.session.record']==> #{controller.request.env['rack.session.record'] rescue 'OOPS'}"
 
           st = st.ticket if st.kind_of? ServiceTicket
           session_id = session_id_from_controller(controller)
