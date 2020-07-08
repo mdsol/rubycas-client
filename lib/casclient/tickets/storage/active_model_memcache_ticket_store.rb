@@ -119,7 +119,7 @@ module CASClient
         def self.find_by_session_id(session_id)
           session_id = "#{namespaced_key(session_id)}"
           session = @@dalli.get(session_id)
-          log.info "found session ===============session_id==> #{session_id}"
+          Rails.logger.info "found session ===============session_id==> #{session_id}"
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
           if session
