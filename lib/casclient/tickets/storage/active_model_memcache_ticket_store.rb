@@ -119,14 +119,17 @@ module CASClient
           if rand(10) > 5
             @@dalli.delete(session_id)
             session = nil
+            Rails.logger.info "-----forcing nil session--------"
           end
 
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
           if session
+            Rails.logger.info "-----session exists--------"
             MemcacheSessionStore.new(session)
           else
-            return false
+            Rails.logger.info "-----no session--------"
+            false
           end
         end
 
