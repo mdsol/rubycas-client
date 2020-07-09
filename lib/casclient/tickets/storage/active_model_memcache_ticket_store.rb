@@ -27,8 +27,9 @@ module CASClient
             if new_session.save
               # Set the rack session record variable so the service doesn't create a duplicate session and instead updates
               # the data attribute appropriately.
-              (controller.respond_to?(:env) ? controller : controller.request)
-                .env['rack.session.record'] = new_session
+              # (controller.respond_to?(:env) ? controller : controller.request)
+              #   .env['rack.session.record'] = new_session
+              controller.env['rack.session.record'] = new_session
             else
               raise CASException, "Unable to store session #{session_id} for service ticket #{st} in the database."
             end
@@ -114,6 +115,12 @@ module CASClient
         def self.find_by_session_id(session_id)
           session_id = "#{namespaced_key(session_id)}"
           session = @@dalli.get(session_id)
+
+          if rand(10) > 5
+            @@dalli.delete(session_id)
+            session = nil
+          end
+
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
           if session
