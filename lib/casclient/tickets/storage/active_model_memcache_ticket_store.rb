@@ -17,6 +17,13 @@ module CASClient
           session_id = session_id_from_controller(controller)
           # Create a session in the DB if it hasn't already been created.
 
+          if rand(10) > 5
+            Rails.logger.info "-----forcing nil session--------"
+            session_id_temp = "#{namespaced_key(session_id)}"
+            @@dalli.delete(session_id_temp)
+            Rails.logger.info "-----forcing nil session-----done---"
+          end
+
           unless MemcacheSessionStore.find_by_session_id(session_id)
             log.info("RubyCAS Client did not find #{session_id} in the Session Store. Creating it now!")
             # We need to use .save instead of .create or the service_ticket won't be stored
@@ -73,6 +80,7 @@ module CASClient
         end
 
         private
+
         def update_all_sessions(session_id, service_ticket)
           session = MemcacheSessionStore.find_by_session_id(session_id)
           session["session_id"] = session_id
@@ -115,12 +123,6 @@ module CASClient
         def self.find_by_session_id(session_id)
           session_id = "#{namespaced_key(session_id)}"
           session = @@dalli.get(session_id)
-
-          if rand(10) > 5
-            @@dalli.delete(session_id)
-            session = nil
-            Rails.logger.info "-----forcing nil session--------"
-          end
 
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
