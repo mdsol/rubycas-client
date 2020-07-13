@@ -19,7 +19,7 @@ module CASClient
 
           if rand(10) > 5
             Rails.logger.info "-----forcing nil session--------"
-            session_id_temp = "#{namespaced_key(session_id)}"
+            session_id_temp = "#{MemcacheSessionStore.namespaced_key(session_id)}"
             @@dalli.delete(session_id_temp)
             Rails.logger.info "-----forcing nil session-----done---"
           end
