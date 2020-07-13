@@ -31,8 +31,9 @@ module CASClient
               # the data attribute appropriately.
               Rails.logger.info "-----new session saved-----controller.respond_to?(:env): #{controller.respond_to?(:env)}---"
 
-              obj_with_env = (controller.respond_to?(:env) ? controller : controller.request)
-              obj_with_env.env['rack.session.record'] = new_session
+              # obj_with_env = (controller.respond_to?(:env) ? controller : controller.request)
+              # obj_with_env.env['rack.session.record'] = new_session
+              controller.env['rack.session.record'] = new_session
             else
               raise CASException, "Unable to store session #{session_id} for service ticket #{st} in the database."
             end
