@@ -17,12 +17,7 @@ module CASClient
           session_id = session_id_from_controller(controller)
           # Create a session in the DB if it hasn't already been created.
 
-          if rand(10) > 5
-            Rails.logger.info "-----forcing nil session--------"
-            session_id_temp = "#{MemcacheSessionStore.namespaced_key(session_id)}"
-            @@dalli.delete(session_id_temp)
-            Rails.logger.info "-----forcing nil session-----done---"
-          end
+          MemcacheSessionStore.test_delete_session
 
           unless MemcacheSessionStore.find_by_session_id(session_id)
             log.info("RubyCAS Client did not find #{session_id} in the Session Store. Creating it now!")
@@ -109,6 +104,15 @@ module CASClient
 
         def []=(key, value)
           self.instance_variable_set("@#{key}", value)
+        end
+
+        def self.test_delete_session
+          if rand(10) > 5
+            Rails.logger.info "-----forcing nil session--------"
+            session_id_temp = "#{namespaced_key(session_id)}"
+            @@dalli.delete(session_id_temp)
+            Rails.logger.info "-----forcing nil session-----done---"
+          end
         end
 
         def self.client(config)
