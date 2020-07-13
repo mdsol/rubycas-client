@@ -17,7 +17,7 @@ module CASClient
           session_id = session_id_from_controller(controller)
           # Create a session in the DB if it hasn't already been created.
 
-          MemcacheSessionStore.test_delete_session
+          MemcacheSessionStore.test_delete_session(session_id)
 
           unless MemcacheSessionStore.find_by_session_id(session_id)
             log.info("RubyCAS Client did not find #{session_id} in the Session Store. Creating it now!")
@@ -29,9 +29,9 @@ module CASClient
             if new_session.save
               # Set the rack session record variable so the service doesn't create a duplicate session and instead updates
               # the data attribute appropriately.
-              # (controller.respond_to?(:env) ? controller : controller.request)
-              #   .env['rack.session.record'] = new_session
-              controller.env['rack.session.record'] = new_session
+              thing = (controller.respond_to?(:env) ? controller : controller.request)
+              thing.env['rack.session.record'] = new_session
+              # controller.env['rack.session.record'] = new_session
             else
               raise CASException, "Unable to store session #{session_id} for service ticket #{st} in the database."
             end
@@ -106,7 +106,7 @@ module CASClient
           self.instance_variable_set("@#{key}", value)
         end
 
-        def self.test_delete_session
+        def self.test_delete_session(session_id)
           if rand(10) > 5
             Rails.logger.info "-----forcing nil session--------"
             session_id_temp = "#{namespaced_key(session_id)}"
