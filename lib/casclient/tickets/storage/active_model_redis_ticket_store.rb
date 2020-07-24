@@ -117,7 +117,6 @@ module CASClient
           session = @client.get(session_id)
 
           session = eval(session) if session.is_a? String
-          Rails.logger.info "RedisSessionStore#find_by_session_id ---------session---> #{session.inspect}, class: #{session.class}"
 
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information

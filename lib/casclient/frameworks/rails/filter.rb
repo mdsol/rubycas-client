@@ -54,6 +54,7 @@ module CASClient
             elsif last_st &&
                 !config[:authenticate_on_every_request] && 
                 controller.session[client.username_session_key]
+
               # Re-use the previous ticket if the user already has a local CAS session (i.e. if they were already
               # previously authenticated for this service). This is to prevent redirection to the CAS server on every
               # request.
@@ -68,7 +69,7 @@ module CASClient
             
             if st
               client.validate_service_ticket(st) unless st.has_been_validated?
-              
+
               if st.is_valid?
                 #if is_new_session
                   log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{st.user.inspect} is VALID.")
@@ -337,7 +338,6 @@ module CASClient
           
           def read_ticket(controller)
             ticket = controller.params[:ticket]
-            
             return nil unless ticket
             
             log.debug("Request contains ticket #{ticket.inspect}.")
