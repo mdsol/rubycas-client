@@ -27,7 +27,8 @@ module CASClient
             if new_session.save
               # Set the rack session record variable so the service doesn't create a duplicate session and instead updates
               # the data attribute appropriately.
-              controller.env['rack.session.record'] = new_session
+              obj_with_env = controller.respond_to?(:env) ? controller : controller.request
+              obj_with_env.env['rack.session.record'] = new_session
             else
               raise CASException, "Unable to store session #{session_id} for service ticket #{st} in the database."
             end

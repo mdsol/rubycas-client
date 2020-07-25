@@ -1,5 +1,9 @@
 # RubyCAS-Client Changelog
 
+## 3.0.5
+* Other
+  * Use controller.request instead of controller to set `.env` value for rack. Rails 5.1+ change.
+
 ## 3.0.4
 * Other
   * Cast session.id to string as with Rails 5.2+ it is of type Rack::Session::SessionId.

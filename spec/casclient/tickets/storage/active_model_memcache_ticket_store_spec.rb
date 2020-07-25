@@ -30,5 +30,18 @@ describe CASClient::Tickets::Storage::ActiveModelMemcacheTicketStore do
       subject.store_service_session_lookup(service_ticket, controller)
       subject.read_service_session_lookup(service_ticket).should eql("existing_session")
     end
+
+    it 'uses correct controller method to access rack session environment' do
+      controller = mock_controller_with_session
+      controller.stub_chain(:session, :session_id).and_return('existing_session')
+      controller.stub(:respond_to?) {false}
+      controller.stub_chain(:request, :env, :[]=)
+
+      @memcache_mock_store = {'existing_session' => {'service_ticket' => 'ST-id'}}
+
+      service_ticket = CASClient::ServiceTicket.new('ST-new', 'ActiveModelMemcacheTicketStore')
+      subject.store_service_session_lookup(service_ticket, controller)
+      subject.read_service_session_lookup(service_ticket).should eql('existing_session')
+    end
   end
 end
