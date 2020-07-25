@@ -1,5 +1,9 @@
 # RubyCAS-Client Changelog
 
+## 3.1.0
+ * New functionality
+   * Sessions can now be stored in Redis.
+
 ## 3.0.5
 * Other
   * Use controller.request instead of controller to set `.env` value for rack. Rails 5.1+ change.

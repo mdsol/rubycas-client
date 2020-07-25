@@ -7,17 +7,23 @@ require 'redis-rack'
 module ActionDispatch
   module Session
     class ActiveModelRedisStore < ActionDispatch::Session::RedisStore
+
+      # This method overrides the redis-rack gem method "delete_session"
+      # https://github.com/redis-store/redis-rack/blob/master/lib/rack/session/redis.rb#L54
+      #
+      # The purpose is to clean up additional cas related entries in the redis cache
+      # when the main rails session is destroyed.
       def delete_session(req, sid, options)
-        Rails.logger.info "==================> ActiveModelRedisStore <====delete_session================="
         begin
           with_lock(req, [nil, {}]) do
-            if sesh = get_session_with_fallback(sid)
-              last_st = sesh['cas_last_valid_ticket']
+            last_st = if sesh = get_session_with_fallback(sid)
+              sesh['cas_last_valid_ticket']
             end
+
             with do |c|
-              c.del("checkmate:#{last_st}")
-              c.del("checkmate:#{sid}")
-              Rails.logger.info "==================> ActiveModelRedisStore <====deleted cas stuff================="
+              [last_st, sid].each do |t|
+                c.del([options[:namespace], t].compact.join(':'))
+              end
             end
           end
         rescue => e
@@ -26,7 +32,6 @@ module ActionDispatch
 
         super
       end
-
     end
   end
 end

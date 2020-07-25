@@ -1,3 +1,3 @@
 module CASClient #:nodoc:
-  VERSION = '3.0.5'.freeze
+  VERSION = '3.1.0'.freeze
 end

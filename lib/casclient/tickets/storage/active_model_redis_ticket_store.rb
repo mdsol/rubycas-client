@@ -1,5 +1,6 @@
 require 'casclient/frameworks/rails/filter'
 require 'redis'
+
 module CASClient
   module Tickets
     module Storage
@@ -26,7 +27,8 @@ module CASClient
             if new_session.save
               # Set the rack session record variable so the service doesn't create a duplicate session and instead updates
               # the data attribute appropriately.
-              controller.request.env['rack.session.record'] = new_session
+              obj_with_env = controller.respond_to?(:env) ? controller : controller.request
+              obj_with_env.env['rack.session.record'] = new_session
             else
               raise CASException, "Unable to store session #{session_id} for service ticket #{st} in the database."
             end
@@ -73,8 +75,8 @@ module CASClient
 
         def update_all_sessions(session_id, service_ticket)
           session = RedisSessionStore.find_by_session_id(session_id)
-          session['session_id'] = session_id
-          session['service_ticket'] = service_ticket
+          session.session_id = session_id
+          session.service_ticket = service_ticket
           session.save
         end
       end
@@ -106,9 +108,14 @@ module CASClient
 
         def self.setup_client(config)
           @client ||= begin
-            @namespace = config[:dalli_settings] && config[:dalli_settings]['namespace']
-            host = (config[:dalli_settings] && config[:dalli_settings]['host']) || 'localhost'
-            Redis.new(url: "rediss://#{host}:6379/0")
+            settings = config[:redis_settings] || {}
+            @namespace = settings['namespace']
+            host = settings['host'] || 'localhost'
+            protocol = settings['secure'] ? 'rediss' : 'redis'
+            port = settings['port'] || '6379'
+            db = settings['db'] || '0'
+
+            Redis.new(url: "#{protocol}://#{host}:#{port}/#{db}")
           end
         end
 

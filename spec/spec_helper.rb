@@ -13,7 +13,6 @@ end
 
 require 'database_cleaner'
 
-# TODO: see if there's a way to only do the setup/teardown for the current type of session store, instead of all 3..
 RSpec.configure do |config|
   config.mock_with :rspec
   config.mock_framework = :rspec
