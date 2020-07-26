@@ -123,7 +123,8 @@ module CASClient
           session_id = namespaced_key(session_id)
           session = @client.get(session_id)
 
-          session = eval(session) if session.is_a? String
+          # Unlike Memcached, Redis returns a serialized hash.
+          session = JSON.parse(session.gsub(/"\s*=>\s*"/, '":"')) if session.is_a? String
 
           # A session is generated immediately without actually logging in, the below line
           # validates that we have a service_ticket so that we can store additional information
