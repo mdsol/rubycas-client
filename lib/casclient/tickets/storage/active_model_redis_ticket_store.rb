@@ -134,6 +134,7 @@ module CASClient
         end
 
         def self.find_by_service_ticket(service_ticket)
+          Rails.logger.info "----ActiveModelRedisTicketStore#find_by_service_ticket-------service_ticket: #{service_ticket}--------------------"
           session_id = @client.get(namespaced_key(service_ticket))
           Rails.logger.info "----ActiveModelRedisTicketStore#find_by_service_ticket-------session_id: #{session_id}--------------------"
           session = RedisSessionStore.find_by_session_id(session_id) if session_id
