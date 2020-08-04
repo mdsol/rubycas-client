@@ -22,10 +22,9 @@ module ActionDispatch
 
             with do |c|
               Rails.logger.info "deleting service-ticket with key #{"#{options[:namespace]}:#{last_st}"}"
-              c.del("#{options[:namespace]}:#{last_st}")
-              # [last_st, sid].each do |t|
-              #   c.del([options[:namespace], t].compact.join(':'))
-              # end
+              [last_st, sid].each do |t|
+                c.del([options[:namespace], t].compact.join(':'))
+              end
             end
           end
         rescue => e

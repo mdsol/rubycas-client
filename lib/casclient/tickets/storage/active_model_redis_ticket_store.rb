@@ -170,8 +170,8 @@ module CASClient
         end
 
         def destroy
-          client.delete(namespaced_key(service_ticket))
-          client.delete(namespaced_key(session_id))
+          client.del(namespaced_key(service_ticket))
+          client.del(namespaced_key(session_id))
         end
 
         alias_method :save!, :save
