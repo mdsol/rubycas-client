@@ -33,7 +33,6 @@ module ActionDispatch
       def destroy_session(env, session_id, options)
         if @pool.exist?(session_id)
           session = @pool.get(session_id)
-          if session.present?
             if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
               begin
                 @pool.delete(session["service_ticket"])
@@ -44,9 +43,6 @@ module ActionDispatch
             else
               CASClient::LoggerWrapper.new.warn("Session::ActiveModelMemcacheStore#destroy_session: Session  #{session_id} has_key?: #{session.has_key?("service_ticket")}, @pool.exist?: #{@pool.exist?(session["service_ticket"])}");
             end
-          else
-            CASClient::LoggerWrapper.new.warn("Session::ActiveModelMemcacheStore#destroy_session: the retrieved pool session for session_id #{session_id} is nil");
-          end
         end
         super(env, session_id, options)
       end
