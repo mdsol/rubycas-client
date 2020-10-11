@@ -30,7 +30,8 @@ module ActionDispatch
       # related data prior to letting the session be destroyed.
       def destroy_session(env, session_id, options)
         if @pool.exist?(session_id)
-          session = @pool.get(session_id)
+        session = @pool.get(session_id)
+	CASClient::LoggerWrapper.new.warn("GABES TEST LOG!");
 	    if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
 	      begin
 		@pool.delete(session["service_ticket"])
