@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubycas-client (3.0.2.1)
+    rubycas-client (3.0.2.2)
       activesupport
       dalli (>= 2.0)
       dice_bag (>= 0.9, < 2.0)
