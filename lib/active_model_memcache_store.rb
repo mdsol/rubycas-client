@@ -31,17 +31,28 @@ module ActionDispatch
       def destroy_session(env, session_id, options)
         if @pool.exist?(session_id)
           session = @pool.get(session_id)
-          if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
-            begin
-              @pool.delete(session["service_ticket"])
-            rescue Dalli::DalliError
-              Rails.logger.warn("Session::DalliStore#destroy_session: #{$!.message}")
-              raise if @raise_errors
+          if session.present?
+            if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
+              begin
+                @pool.delete(session["service_ticket"])
+              rescue Dalli::DalliError
+                CASClient::LoggerWrapper.new.warn("Session::DalliStore#destroy_session: #{$!.message}");
+                raise if @raise_errors
+              end
+            else
+              CASClient::LoggerWrapper.new.warn("Session::ActiveModelMemcacheStore#destroy_session: Session  #{session_id} has_key?: #{session.has_key?("service_ticket")}, @pool.exist?: #{@pool.exist?(session["service_ticket"])}");
             end
+          else
+            CASClient::LoggerWrapper.new.warn("Session::ActiveModelMemcacheStore#destroy_session: the retrieved pool session for session_id #{session_id} is nil");
           end
         end
         super(env, session_id, options)
       end
+
+      # Patch Rack 2.0 changes that broke ActionDispatch.
+      alias_method :find_session, :get_session
+      alias_method :write_session, :set_session
+      alias_method :delete_session, :destroy_session
 
     end
   end
