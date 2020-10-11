@@ -41,8 +41,6 @@ module ActionDispatch
                 CASClient::LoggerWrapper.new.warn("Session::DalliStore#destroy_session: #{$!.message}");
                 raise if @raise_errors
               end
-            else
-              CASClient::LoggerWrapper.new.warn("Session::ActiveModelMemcacheStore#destroy_session: Session  #{session_id} has_key?: #{session.has_key?("service_ticket")}, @pool.exist?: #{@pool.exist?(session["service_ticket"])}");
             end
         end
         super(env, session_id, options)

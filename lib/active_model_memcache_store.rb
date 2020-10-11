@@ -31,7 +31,6 @@ module ActionDispatch
       def destroy_session(env, session_id, options)
         if @pool.exist?(session_id)
         session = @pool.get(session_id)
-	CASClient::LoggerWrapper.new.warn("GABES TEST LOG!");
 	    if session.has_key?("service_ticket") && @pool.exist?(session["service_ticket"])
 	      begin
 		@pool.delete(session["service_ticket"])
@@ -39,8 +38,6 @@ module ActionDispatch
 		CASClient::LoggerWrapper.new.warn("Session::DalliStore#destroy_session: #{$!.message}");
 		raise if @raise_errors
 	      end
-	    else
-	      CASClient::LoggerWrapper.new.warn("Session::ActiveModelMemcacheStore#destroy_session: Session  #{session_id} has_key?: #{session.has_key?("service_ticket")}, @pool.exist?: #{@pool.exist?(session["service_ticket"])}");
 	    end
         end
         super(env, session_id, options)
